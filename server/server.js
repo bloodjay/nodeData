@@ -20,6 +20,7 @@ const _ = require('lodash');
 const {Todo} = require('./models/todo');
 const {User} = require('./models/user');
 const {mongoose} = require('./db/mongoose');
+var {authenticate} = require('./middleware/authenticate')
 
 
 var app = express();
@@ -118,8 +119,6 @@ app.post('/users',(req,res) => {
     var body = _.pick(req.body,['email','password']);
     var user = new User(body);
     
-
-
     user.save().then(() => {
         return user.generateAuthToken();
         res.send(user)
@@ -130,9 +129,15 @@ app.post('/users',(req,res) => {
     })
 })
 
+
+app.get('/users/me',authenticate,(req,res) => {
+   res.send(req.user)
+})
+
 app.listen(3000, () => {
     console.log('Started port 3000')
 })
+
 
 module.exports = { app }
 
